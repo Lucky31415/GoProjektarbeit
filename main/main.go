@@ -1,7 +1,8 @@
 package main
 
 func main() {
-	test1()
+	unitTest1()
+	//test1()
 	//rz1 := ScanRZ()
 	//rz2 := ScanRZ()
 	//

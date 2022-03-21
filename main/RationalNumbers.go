@@ -39,6 +39,18 @@ func AddRz(x RZ, y RZ) RZ {
 	return z
 }
 
+func AddRz2(x RZ, y RZ) RZ {
+	SkaliereRZ2(&x, y.Nenner)
+	SkaliereRZ2(&y, x.Nenner)
+
+	z := RZ{
+		Zaehler: x.Zaehler + y.Zaehler,
+		Nenner:  x.Nenner,
+	}
+
+	return z
+}
+
 func SkaliereRZ(x RZ, k int) RZ {
 	z := RZ{
 		Zaehler: x.Zaehler * k,
@@ -46,6 +58,11 @@ func SkaliereRZ(x RZ, k int) RZ {
 	}
 
 	return z
+}
+
+func SkaliereRZ2(x *RZ, k int) {
+	x.Zaehler *= k
+	x.Nenner *= k
 }
 
 func MultRZ(x RZ, y RZ) RZ {
