@@ -1,10 +1,11 @@
 package main
 
 func main() {
-	x := RZ{
-		Zaehler: 5,
-		Nenner:  7,
-	}
+	test1()
+	//rz1 := ScanRZ()
+	//rz2 := ScanRZ()
+	//
+	//rzSum := AddRz(rz1, rz2)
+	//PrintRZ(rzSum)
 
-	PrintRZ(x)
 }
