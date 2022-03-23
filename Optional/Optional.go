@@ -1,4 +1,4 @@
-package main
+package Optional
 
 type Optional[T any] struct {
 	b   bool

@@ -1,4 +1,6 @@
-package main
+package Parser
+
+//import "github.com/Lucky31415/GoProjektarbeit/Tokenizer"
 
 type Parser struct {
 	tokenizer Tokenizer

@@ -1,4 +1,4 @@
-package main
+package Tokenizer
 
 type Token_t string
 
