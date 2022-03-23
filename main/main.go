@@ -1,7 +1,13 @@
 package main
 
+import "fmt"
+
 func main() {
-	unitTest1()
+
+	me := NewMultExp(NewIntExp(1), NewPlusExp(NewIntExp(3), NewIntExp(5)))
+	fmt.Printf("%s = %d", me.Pretty(), me.Eval())
+
+	//unitTest1()
 	//test1()
 	//rz1 := ScanRZ()
 	//rz2 := ScanRZ()
