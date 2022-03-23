@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	//"github.com/Lucky31415/GoProjektarbeit/Expressions"
+
+	"github.com/Lucky31415/GoProjektarbeit/Expressions"
 )
 
 func main() {
-
-	me := NewMultExp(NewIntExp(1), NewPlusExp(NewIntExp(3), NewIntExp(5)))
+	me := Expressions.NewMultExp(Expressions.NewIntExp(1), Expressions.NewPlusExp(Expressions.NewIntExp(3), Expressions.NewIntExp(5)))
 	fmt.Printf("%s = %d", me.Pretty(), me.Eval())
 
 	//unitTest1()

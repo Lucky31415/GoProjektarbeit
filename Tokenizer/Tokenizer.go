@@ -13,33 +13,33 @@ const (
 	MULT  Token_t = "MULT"
 )
 
-type Tokenize struct {
+type tokenize struct {
 	s   string
 	pos int
 }
 
 type Tokenizer struct {
-	tokenize Tokenize
-	token    Token_t
+	tokenize tokenize
+	Token    Token_t
 }
 
 func NewTokenizer(s string) Tokenizer {
-	tokenize := Tokenize{
+	tokenize := tokenize{
 		s:   s,
 		pos: 0,
 	}
 
 	return Tokenizer{
 		tokenize: tokenize,
-		token:    tokenize.Next(),
+		Token:    tokenize.next(),
 	}
 }
 
 func (t Tokenizer) NextToken() {
-	t.token = t.tokenize.Next()
+	t.Token = t.tokenize.next()
 }
 
-func (t Tokenize) Next() Token_t {
+func (t tokenize) next() Token_t {
 	pos := t.pos
 	s := t.s
 
@@ -84,20 +84,20 @@ func (t Tokenize) Next() Token_t {
 	return EOS
 }
 
-func (t Tokenize) Scan() []Token_t {
+func (t tokenize) scan() []Token_t {
 	v := []Token_t{}
 	token := ONE
 
 	for token != EOS {
-		token = t.Next()
+		token = t.next()
 		v = append(v, token)
 	}
 
 	return v
 }
 
-func (t Tokenize) Show() string {
-	v := t.Scan()
+func (t tokenize) show() string {
+	v := t.scan()
 	s := ""
 
 	for i := 0; i < len(v); i++ {

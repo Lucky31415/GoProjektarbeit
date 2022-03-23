@@ -1,6 +1,11 @@
 package Parser
 
-//import "github.com/Lucky31415/GoProjektarbeit/Tokenizer"
+import (
+	. "github.com/Lucky31415/GoProjektarbeit/Expressions"
+	. "github.com/Lucky31415/GoProjektarbeit/Tokenizer"
+
+	. "github.com/Lucky31415/GoProjektarbeit/Optional"
+)
 
 type Parser struct {
 	tokenizer Tokenizer
@@ -14,59 +19,59 @@ func NewParser(s string) Parser {
 }
 
 // Parsing Functions
-func (p Parser) ParseE() Optional[Expression] {
-	t := p.ParseT()
+func (p Parser) parseE() Optional[Expression] {
+	t := p.parseT()
 	if t.IsNothing() {
 		return t
 	}
 
-	return p.ParseE2(t.FromJust())
+	return p.parseE2(t.FromJust())
 }
 
-func (p Parser) ParseE2(left Expression) Optional[Expression] {
+func (p Parser) parseE2(left Expression) Optional[Expression] {
 	tokenizer := p.tokenizer
 
-	if tokenizer.token == PLUS {
+	if tokenizer.Token == PLUS {
 		tokenizer.NextToken()
 
-		right := p.ParseT()
+		right := p.parseT()
 		if right.IsNothing() {
 			return right
 		}
 
-		return p.ParseE2(NewPlusExp(left, right.FromJust()))
+		return p.parseE2(NewPlusExp(left, right.FromJust()))
 	}
 
 	return Just(left)
 }
 
-func (p Parser) ParseT() Optional[Expression] {
-	f := p.ParseF()
+func (p Parser) parseT() Optional[Expression] {
+	f := p.parseF()
 	if f.IsNothing() {
 		return f
 	}
 
-	return p.ParseT2(f.FromJust())
+	return p.parseT2(f.FromJust())
 }
 
-func (p Parser) ParseT2(left Expression) Optional[Expression] {
+func (p Parser) parseT2(left Expression) Optional[Expression] {
 	tokenizer := p.tokenizer
-	if tokenizer.token == MULT {
+	if tokenizer.Token == MULT {
 		tokenizer.NextToken()
-		right := p.ParseF()
+		right := p.parseF()
 		if right.IsNothing() {
 			return right
 		}
-		return p.ParseT2(NewMultExp(left, right.FromJust()))
+		return p.parseT2(NewMultExp(left, right.FromJust()))
 	}
 
 	return Just(left)
 }
 
-func (p Parser) ParseF() Optional[Expression] {
+func (p Parser) parseF() Optional[Expression] {
 	tokenizer := p.tokenizer
 
-	switch tokenizer.token {
+	switch tokenizer.Token {
 	case ZERO:
 		tokenizer.NextToken()
 		return Just[Expression](NewIntExp(0))
@@ -78,13 +83,13 @@ func (p Parser) ParseF() Optional[Expression] {
 		return Just[Expression](NewIntExp(2))
 	case OPEN:
 		tokenizer.NextToken()
-		e := p.ParseE()
+		e := p.parseE()
 
 		if e.IsNothing() {
 			return e
 		}
 
-		if tokenizer.token != CLOSE {
+		if tokenizer.Token != CLOSE {
 			return Nothing[Expression]()
 		}
 
