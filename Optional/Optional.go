@@ -14,7 +14,7 @@ func NewOptional[T any]() Optional[T] {
 
 func NewOptionalV[T any](val T) Optional[T] {
 	return Optional[T]{
-		b:   false,
+		b:   true,
 		val: val,
 	}
 }

@@ -19,7 +19,11 @@ func NewParser(s string) Parser {
 }
 
 // Parsing Functions
-func (p Parser) parseE() Optional[Expression] {
+func (p Parser) Parse() Optional[Expression] {
+	return p.parseE()
+}
+
+func (p *Parser) parseE() Optional[Expression] {
 	t := p.parseT()
 	if t.IsNothing() {
 		return t
@@ -28,11 +32,9 @@ func (p Parser) parseE() Optional[Expression] {
 	return p.parseE2(t.FromJust())
 }
 
-func (p Parser) parseE2(left Expression) Optional[Expression] {
-	tokenizer := p.tokenizer
-
-	if tokenizer.Token == PLUS {
-		tokenizer.NextToken()
+func (p *Parser) parseE2(left Expression) Optional[Expression] {
+	if p.tokenizer.Token == PLUS {
+		p.tokenizer.NextToken()
 
 		right := p.parseT()
 		if right.IsNothing() {
@@ -45,7 +47,7 @@ func (p Parser) parseE2(left Expression) Optional[Expression] {
 	return Just(left)
 }
 
-func (p Parser) parseT() Optional[Expression] {
+func (p *Parser) parseT() Optional[Expression] {
 	f := p.parseF()
 	if f.IsNothing() {
 		return f
@@ -54,10 +56,9 @@ func (p Parser) parseT() Optional[Expression] {
 	return p.parseT2(f.FromJust())
 }
 
-func (p Parser) parseT2(left Expression) Optional[Expression] {
-	tokenizer := p.tokenizer
-	if tokenizer.Token == MULT {
-		tokenizer.NextToken()
+func (p *Parser) parseT2(left Expression) Optional[Expression] {
+	if p.tokenizer.Token == MULT {
+		p.tokenizer.NextToken()
 		right := p.parseF()
 		if right.IsNothing() {
 			return right
@@ -68,32 +69,30 @@ func (p Parser) parseT2(left Expression) Optional[Expression] {
 	return Just(left)
 }
 
-func (p Parser) parseF() Optional[Expression] {
-	tokenizer := p.tokenizer
-
-	switch tokenizer.Token {
+func (p *Parser) parseF() Optional[Expression] {
+	switch p.tokenizer.Token {
 	case ZERO:
-		tokenizer.NextToken()
+		p.tokenizer.NextToken()
 		return Just[Expression](NewIntExp(0))
 	case ONE:
-		tokenizer.NextToken()
+		p.tokenizer.NextToken()
 		return Just[Expression](NewIntExp(1))
 	case TWO:
-		tokenizer.NextToken()
+		p.tokenizer.NextToken()
 		return Just[Expression](NewIntExp(2))
 	case OPEN:
-		tokenizer.NextToken()
+		p.tokenizer.NextToken()
 		e := p.parseE()
 
 		if e.IsNothing() {
 			return e
 		}
 
-		if tokenizer.Token != CLOSE {
+		if p.tokenizer.Token != CLOSE {
 			return Nothing[Expression]()
 		}
 
-		tokenizer.NextToken()
+		p.tokenizer.NextToken()
 		return e
 	default:
 		return Nothing[Expression]()

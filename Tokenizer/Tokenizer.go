@@ -29,54 +29,53 @@ func NewTokenizer(s string) Tokenizer {
 		pos: 0,
 	}
 
-	return Tokenizer{
+	t := Tokenizer{
 		tokenize: tokenize,
 		Token:    tokenize.next(),
 	}
+
+	return t
 }
 
-func (t Tokenizer) NextToken() {
+func (t *Tokenizer) NextToken() {
 	t.Token = t.tokenize.next()
 }
 
-func (t tokenize) next() Token_t {
-	pos := t.pos
-	s := t.s
-
-	if len(s) <= pos {
+func (t *tokenize) next() Token_t {
+	if len(t.s) <= t.pos {
 		return EOS
 	}
 
 	for true {
 
-		if len(s) <= pos {
+		if len(t.s) <= t.pos {
 			return EOS
 		}
 
-		switch s[pos] {
-		case '0':
-			pos++
+		switch string(t.s[t.pos]) {
+		case "0":
+			t.pos++
 			return ZERO
-		case '1':
-			pos++
+		case "1":
+			t.pos++
 			return ONE
-		case '2':
-			pos++
+		case "2":
+			t.pos++
 			return TWO
-		case '(':
-			pos++
+		case "(":
+			t.pos++
 			return OPEN
-		case ')':
-			pos++
+		case ")":
+			t.pos++
 			return CLOSE
-		case '+':
-			pos++
+		case "+":
+			t.pos++
 			return PLUS
-		case '*':
-			pos++
+		case "*":
+			t.pos++
 			return MULT
 		default:
-			pos++
+			t.pos++
 			break
 		}
 	}
@@ -84,7 +83,7 @@ func (t tokenize) next() Token_t {
 	return EOS
 }
 
-func (t tokenize) scan() []Token_t {
+func (t *tokenize) scan() []Token_t {
 	v := []Token_t{}
 	token := ONE
 
@@ -96,7 +95,7 @@ func (t tokenize) scan() []Token_t {
 	return v
 }
 
-func (t tokenize) show() string {
+func (t *tokenize) show() string {
 	v := t.scan()
 	s := ""
 
