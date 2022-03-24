@@ -1,7 +1,9 @@
 package VM
 
 import (
+	. "github.com/Lucky31415/GoProjektarbeit/Expressions"
 	. "github.com/Lucky31415/GoProjektarbeit/Optional"
+	. "github.com/Lucky31415/GoProjektarbeit/Parser"
 	. "github.com/Lucky31415/GoProjektarbeit/Stack"
 )
 
@@ -58,6 +60,17 @@ func NewVm(codes []Code) VM {
 	}
 }
 
+func NewVmFromExp(exp Expression) VM {
+	stack := NewStack[Code]()
+	codesFromExpression(exp, &stack)
+	codes := stack.GetSlice()
+
+	return VM{
+		codes: codes,
+		stack: NewStack[int](),
+	}
+}
+
 func (vm *VM) Run() Optional[int] {
 	stack := NewStack[int]()
 
@@ -81,4 +94,33 @@ func (vm *VM) Run() Optional[int] {
 	}
 
 	return Just(stack.Top())
+}
+
+func codesFromExpression(e Expression, stack *Stack[Code]) {
+	switch e.(type) {
+	case IntExp:
+		stack.Push(NewPush(e.Eval()))
+	case PlusExp:
+		v := e.(PlusExp)
+		codesFromExpression(v.L, stack)
+		codesFromExpression(v.R, stack)
+		stack.Push(NewPlus())
+	case MultExp:
+		v := e.(MultExp)
+		codesFromExpression(v.L, stack)
+		codesFromExpression(v.R, stack)
+		stack.Push(NewMult())
+	}
+}
+
+// Static function
+func RunOnVM(rawExp string) Optional[int] {
+	expOpt := NewParser(rawExp).Parse()
+	if expOpt.IsNothing() {
+		return Nothing[int]()
+	}
+	exp := expOpt.FromJust()
+
+	vm := NewVmFromExp(exp)
+	return vm.Run()
 }

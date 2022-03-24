@@ -36,4 +36,7 @@ func TestVM() {
 	vm = NewVm(codes)
 	res = vm.Run()
 	showVMRes(res)
+
+	res = RunOnVM("(1 + 2) * 2 + 2")
+	showVMRes(res)
 }

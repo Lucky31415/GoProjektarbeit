@@ -33,3 +33,7 @@ func (s *Stack[T]) Top() T {
 func (s *Stack[T]) IsEmpty() bool {
 	return len(s.stack) == 0
 }
+
+func (s *Stack[T]) GetSlice() []T {
+	return s.stack
+}
