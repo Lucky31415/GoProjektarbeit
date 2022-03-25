@@ -3,7 +3,7 @@ package Tests
 import (
 	"fmt"
 
-	. "github.com/Lucky31415/GoProjektarbeit/Expressions"
+	. "github.com/Lucky31415/GoProjektarbeit/Expression"
 	. "github.com/Lucky31415/GoProjektarbeit/Optional"
 	. "github.com/Lucky31415/GoProjektarbeit/Parser"
 )

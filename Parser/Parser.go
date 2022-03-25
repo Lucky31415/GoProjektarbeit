@@ -1,7 +1,7 @@
 package Parser
 
 import (
-	. "github.com/Lucky31415/GoProjektarbeit/Expressions"
+	. "github.com/Lucky31415/GoProjektarbeit/Expression"
 	. "github.com/Lucky31415/GoProjektarbeit/Tokenizer"
 
 	. "github.com/Lucky31415/GoProjektarbeit/Optional"
