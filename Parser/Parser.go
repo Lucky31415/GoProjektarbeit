@@ -7,23 +7,32 @@ import (
 	. "github.com/Lucky31415/GoProjektarbeit/Optional"
 )
 
-type Parser struct {
+type Parser interface {
+	Parse() Optional[Expression]
+	parseE() Optional[Expression]
+	parseE2(left Expression) Optional[Expression]
+	parseT() Optional[Expression]
+	parseT2(left Expression) Optional[Expression]
+	parseF() Optional[Expression]
+}
+
+type ParserImpl struct {
 	tokenizer Tokenizer
 }
 
 // Constructor
-func NewParser(s string) Parser {
-	return Parser{
+func NewParser(s string) *ParserImpl {
+	return &ParserImpl{
 		tokenizer: NewTokenizer(s),
 	}
 }
 
 // Parsing Functions
-func (p Parser) Parse() Optional[Expression] {
+func (p *ParserImpl) Parse() Optional[Expression] {
 	return p.parseE()
 }
 
-func (p *Parser) parseE() Optional[Expression] {
+func (p *ParserImpl) parseE() Optional[Expression] {
 	t := p.parseT()
 	if t.IsNothing() {
 		return t
@@ -32,8 +41,8 @@ func (p *Parser) parseE() Optional[Expression] {
 	return p.parseE2(t.FromJust())
 }
 
-func (p *Parser) parseE2(left Expression) Optional[Expression] {
-	if p.tokenizer.Token == PLUS {
+func (p *ParserImpl) parseE2(left Expression) Optional[Expression] {
+	if p.tokenizer.GetToken() == PLUS {
 		p.tokenizer.NextToken()
 
 		right := p.parseT()
@@ -47,7 +56,7 @@ func (p *Parser) parseE2(left Expression) Optional[Expression] {
 	return Just(left)
 }
 
-func (p *Parser) parseT() Optional[Expression] {
+func (p *ParserImpl) parseT() Optional[Expression] {
 	f := p.parseF()
 	if f.IsNothing() {
 		return f
@@ -56,8 +65,8 @@ func (p *Parser) parseT() Optional[Expression] {
 	return p.parseT2(f.FromJust())
 }
 
-func (p *Parser) parseT2(left Expression) Optional[Expression] {
-	if p.tokenizer.Token == MULT {
+func (p *ParserImpl) parseT2(left Expression) Optional[Expression] {
+	if p.tokenizer.GetToken() == MULT {
 		p.tokenizer.NextToken()
 		right := p.parseF()
 		if right.IsNothing() {
@@ -69,8 +78,8 @@ func (p *Parser) parseT2(left Expression) Optional[Expression] {
 	return Just(left)
 }
 
-func (p *Parser) parseF() Optional[Expression] {
-	switch p.tokenizer.Token {
+func (p *ParserImpl) parseF() Optional[Expression] {
+	switch p.tokenizer.GetToken() {
 	case ZERO:
 		p.tokenizer.NextToken()
 		return Just[Expression](NewIntExp(0))
@@ -88,7 +97,7 @@ func (p *Parser) parseF() Optional[Expression] {
 			return e
 		}
 
-		if p.tokenizer.Token != CLOSE {
+		if p.tokenizer.GetToken() != CLOSE {
 			return Nothing[Expression]()
 		}
 

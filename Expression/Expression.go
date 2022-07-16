@@ -1,10 +1,16 @@
 package Expression
 
-import "fmt"
+import (
+	"fmt"
+
+	. "github.com/Lucky31415/GoProjektarbeit/Code"
+	. "github.com/Lucky31415/GoProjektarbeit/Stack"
+)
 
 type Expression interface {
 	Eval() int
 	Pretty() string
+	Compile(codeStack Stack[Code])
 }
 
 // ---------------------------- IntExp ----------------------------
@@ -24,6 +30,10 @@ func (ie IntExp) Eval() int {
 
 func (ie IntExp) Pretty() string {
 	return fmt.Sprintf("%d", ie.Value)
+}
+
+func (ie IntExp) Compile(codeStack Stack[Code]) {
+	codeStack.Push(NewPush(ie.Eval()))
 }
 
 // ---------------------------- PlusExp ----------------------------
@@ -47,6 +57,12 @@ func (pe PlusExp) Pretty() string {
 	return fmt.Sprintf("(%s + %s)", pe.L.Pretty(), pe.R.Pretty())
 }
 
+func (pe PlusExp) Compile(codeStack Stack[Code]) {
+	pe.L.Compile(codeStack)
+	pe.R.Compile(codeStack)
+	codeStack.Push(NewPlus())
+}
+
 // ---------------------------- MultExp ----------------------------
 type MultExp struct {
 	L Expression
@@ -66,4 +82,10 @@ func (me MultExp) Eval() int {
 
 func (me MultExp) Pretty() string {
 	return fmt.Sprintf("(%s * %s)", me.L.Pretty(), me.R.Pretty())
+}
+
+func (me MultExp) Compile(codeStack Stack[Code]) {
+	me.L.Compile(codeStack)
+	me.R.Compile(codeStack)
+	codeStack.Push(NewMult())
 }

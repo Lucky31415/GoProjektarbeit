@@ -3,6 +3,7 @@ package Tests
 import (
 	"fmt"
 
+	. "github.com/Lucky31415/GoProjektarbeit/Code"
 	. "github.com/Lucky31415/GoProjektarbeit/Optional"
 	. "github.com/Lucky31415/GoProjektarbeit/VM"
 )
@@ -22,7 +23,8 @@ func TestVM() {
 		NewMult(),
 		NewPlus(),
 	}
-	vm := NewVm(codes)
+	var vm VM
+	vm = NewVm(codes)
 	res := vm.Run()
 	showVMRes(res)
 

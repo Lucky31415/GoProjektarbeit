@@ -1,119 +1,101 @@
 package VM
 
 import (
+	. "github.com/Lucky31415/GoProjektarbeit/Code"
 	. "github.com/Lucky31415/GoProjektarbeit/Expression"
 	. "github.com/Lucky31415/GoProjektarbeit/Optional"
 	. "github.com/Lucky31415/GoProjektarbeit/Parser"
 	. "github.com/Lucky31415/GoProjektarbeit/Stack"
 )
 
-type OpCode_t string
-
-const (
-	PUSH OpCode_t = "PUSH"
-	PLUS OpCode_t = "PLUS"
-	MULT OpCode_t = "MULT"
-)
-
-// -------------------------- Code --------------------------
-type Code struct {
-	Kind OpCode_t
-	Val  int
+// -------------------------- VM Interface --------------------------
+type VM interface {
+	push(i int)
+	plus()
+	mult()
+	Run() Optional[int]
 }
 
-func newCode(o OpCode_t) Code {
-	return Code{
-		Kind: o,
-		Val:  0,
-	}
-}
-
-func newCode2(o OpCode_t, val int) Code {
-	return Code{
-		Kind: o,
-		Val:  val,
-	}
-}
-
-func NewPush(i int) Code {
-	return newCode2(PUSH, i)
-}
-
-func NewPlus() Code {
-	return newCode(PLUS)
-}
-
-func NewMult() Code {
-	return newCode(MULT)
-}
-
-// -------------------------- VM --------------------------
-type VM struct {
+// -------------------------- VMImpl --------------------------
+type VMImpl struct {
 	codes []Code
 	stack Stack[int]
 }
 
-func NewVm(codes []Code) VM {
-	return VM{
+func NewVm(codes []Code) *VMImpl {
+	return &VMImpl{
 		codes: codes,
 		stack: NewStack[int](),
 	}
 }
 
-func NewVmFromExp(exp Expression) VM {
+func NewVmFromExp(exp Expression) *VMImpl {
 	stack := NewStack[Code]()
-	codesFromExpression(exp, &stack)
+	//codesFromExpression(exp, &stack)
+	exp.Compile(stack)
 	codes := stack.GetSlice()
 
-	return VM{
+	return &VMImpl{
 		codes: codes,
 		stack: NewStack[int](),
 	}
 }
 
-func (vm *VM) Run() Optional[int] {
-	stack := NewStack[int]()
+func (vm *VMImpl) push(i int) {
+	vm.stack.Push(i)
+}
+
+func (vm *VMImpl) plus() {
+	right := vm.stack.Pop()
+	left := vm.stack.Pop()
+	vm.stack.Push(left + right)
+}
+
+func (vm *VMImpl) mult() {
+	right := vm.stack.Pop()
+	left := vm.stack.Pop()
+	vm.stack.Push(left * right)
+}
+
+func (vm *VMImpl) Run() Optional[int] {
+	vm.stack = NewStack[int]()
 
 	for _, opCode := range vm.codes {
 		switch opCode.Kind {
 		case PUSH:
-			stack.Push(opCode.Val)
+			vm.push(opCode.Val)
 		case MULT:
-			right := stack.Pop()
-			left := stack.Pop()
-			stack.Push(left * right)
+			vm.mult()
 		case PLUS:
-			right := stack.Pop()
-			left := stack.Pop()
-			stack.Push(left + right)
+			vm.plus()
 		}
 	}
 
-	if stack.IsEmpty() {
+	if vm.stack.IsEmpty() {
 		return Nothing[int]()
 	}
 
-	return Just(stack.Top())
-}
-
-func codesFromExpression(e Expression, stack *Stack[Code]) {
-	switch e.(type) {
-	case IntExp:
-		stack.Push(NewPush(e.Eval()))
-	case PlusExp:
-		v := e.(PlusExp)
-		codesFromExpression(v.L, stack)
-		codesFromExpression(v.R, stack)
-		stack.Push(NewPlus())
-	case MultExp:
-		v := e.(MultExp)
-		codesFromExpression(v.L, stack)
-		codesFromExpression(v.R, stack)
-		stack.Push(NewMult())
-	}
+	return Just(vm.stack.Top())
 }
 
 // Static function
+//func codesFromExpression(e Expression, codeStack *Stack[Code]) {
+//	switch e.(type) {
+//	case IntExp:
+//		codeStack.Push(NewPush(e.Eval()))
+//	case PlusExp:
+//		v := e.(PlusExp)
+//		codesFromExpression(v.L, codeStack)
+//		codesFromExpression(v.R, codeStack)
+//		codeStack.Push(NewPlus())
+//	case MultExp:
+//		v := e.(MultExp)
+//		codesFromExpression(v.L, codeStack)
+//		codesFromExpression(v.R, codeStack)
+//		codeStack.Push(NewMult())
+//	}
+//}
+
 func RunOnVM(rawExp string) Optional[int] {
 	expOpt := NewParser(rawExp).Parse()
 	if expOpt.IsNothing() {

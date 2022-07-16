@@ -13,35 +13,48 @@ const (
 	MULT  Token_t = "MULT"
 )
 
-type tokenize struct {
+type tokenize interface {
+	next() Token_t
+	scan() []Token_t
+	show() string
+}
+
+type tokenizeImpl struct {
 	s   string
 	pos int
 }
 
-type Tokenizer struct {
+type Tokenizer interface {
+	NextToken()
+	GetToken() Token_t
+}
+
+type TokenizerImpl struct {
 	tokenize tokenize
 	Token    Token_t
 }
 
-func NewTokenizer(s string) Tokenizer {
-	tokenize := tokenize{
+func NewTokenizer(s string) *TokenizerImpl {
+	tokenize := &tokenizeImpl{
 		s:   s,
 		pos: 0,
 	}
 
-	t := Tokenizer{
+	return &TokenizerImpl{
 		tokenize: tokenize,
 		Token:    tokenize.next(),
 	}
-
-	return t
 }
 
-func (t *Tokenizer) NextToken() {
+func (t *TokenizerImpl) NextToken() {
 	t.Token = t.tokenize.next()
 }
 
-func (t *tokenize) next() Token_t {
+func (t TokenizerImpl) GetToken() Token_t {
+	return t.Token
+}
+
+func (t *tokenizeImpl) next() Token_t {
 	if len(t.s) <= t.pos {
 		return EOS
 	}
@@ -83,7 +96,7 @@ func (t *tokenize) next() Token_t {
 	return EOS
 }
 
-func (t *tokenize) scan() []Token_t {
+func (t *tokenizeImpl) scan() []Token_t {
 	v := []Token_t{}
 	token := ONE
 
@@ -95,7 +108,7 @@ func (t *tokenize) scan() []Token_t {
 	return v
 }
 
-func (t *tokenize) show() string {
+func (t *tokenizeImpl) show() string {
 	v := t.scan()
 	s := ""
 
