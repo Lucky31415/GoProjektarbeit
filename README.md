@@ -40,7 +40,7 @@ Es werden die beiden obersten Zahlen vom Stack genommen, multipliziert und das E
 ## Beispiele
 ### Parser
 Der folgende Code führt zu folgender Ausgabe:
-```
+```go
 display(NewParser("(1)").Parse())
 display(NewParser("1").Parse())
 display(NewParser("1 + 0").Parse())
@@ -63,7 +63,7 @@ display(NewParser("(1 + 2) * 0 + 2").Parse())
 
 ### VM
 Der folgende Code führt zu folgender Ausgabe:
-```
+```go
 codes := []Code{
   NewPush(1),
   NewPush(2),
@@ -94,3 +94,69 @@ showVMRes(res)
 // VM stack (top): 16
 // VM stack (top): 8
 ```
+
+## Vergleich der Go-Konzepte zu C++
+### Klassen
+In C++ werden Klassen sowie ihre zugehörigen Variablen und Funktionen direkt definiert. In Go werden nur die Klassenvariablen bei der Definition vorgegeben und dann beliebige funktionen dazu implementiert. <br><br>
+**C++**
+```c++
+class IntExpression : public Expression
+{
+public:
+	IntExpression(int value);
+	int Eval();
+	char* Pretty();
+	void Compile(Stack<Code> codeStack);
+
+protected:
+	int value;
+};
+```
+**Go**
+```go
+type IntExpression struct {
+	Value int
+}
+```
+### Interfaces
+In C++ gibt es keine expliziten Interfaces. Man erreicht die Funktionen eines Interfaces über die definition abstrakter Oberklassen in denen pur virtuelle Funktionen definiert werden, die dann in abgeleiteten Klassen implementiert werden müssen.<br><br>
+**C++**
+```c++
+class Expression {
+public:
+	virtual int Eval() = 0;
+	virtual char* Pretty() = 0;
+	virtual void Compile(Stack<Code> codeStack) = 0;
+};
+```
+In Go können Interfaces direkt definiert werden. Hierbei werden die nötigen zu implementierenden Funktionen festgelegt. Die Zuordnung, welche Klassen dieses Interface implementieren geschieht dann zur Compilezeit. Jede Klasse die die Bedingungen des Interfaces erfüllt, wird zu einer Implementierung dieses Interfaces. Im Gegensatz zu C++, wo das "Interface" als Oberklasse der Implementation angegeben werden muss. <br>
+**Go**
+```go
+type Expression interface {
+	Eval() int
+	Pretty() string
+	Compile(codeStack Stack[Code])
+}
+```
+### Generics
+Generische Klassen heißen in C++ "templates". Sie werden über das Schlüsselwort "template" gefolgt von spitzen Klammern definiert, in denen der Generische Typ eingeschränkt werden kann.<br><br>
+**C++**
+```c++
+template<class T> class Stack {
+   ...
+};
+```
+Seit Version 1.18 unterstützt auch Go generische Strukturen. Sie werden über eckige Klammern hinter dem Namen einer Klasse (oder Interfaces/Funktionen) markiert, in denen ebenfalls der generische Typ eingeschränkt werden kann. <br>
+**Go**
+```go
+type Stack[T any] interface {
+	...
+}
+```
+### Anderes
+#### Overloading
+Go unterstützt das Überladen von Funktionen nicht. Es ist also nicht möglich zwei Funktionen mit dem selben Namen zu definieren, die sich nur in den Paramtern unterscheiden.
+#### Objektorientierung
+Auch wenn man in Go die Funktionalitäten von Klassen mit Hilfe von Structs und Interfaces teilweise nachbauen kann ist Go nicht Objektorientiert. Konzepte wie Vererbung sind nicht vorgesehen und nur schwer zu replizieren.
+#### Concurrency
+Go bietet mit seinen "Go-Routinen" eine sehr einfache Möglichkeit, Funktionen parallel laufen zu lassen. Mit dem Schlüsselwort "go" gefolgt von einem Funktionsaufruf wird dieser parallel zum Haupt Thread ausgeführt. Dazu bietet Go noch nützliche Datentypen wie [Channel](https://golangdocs.com/channels-in-golang) oder Pakete wie [sync](https://pkg.go.dev/sync), die die Parallelisierung noch weiter vereinfachen. Das Parallelisieren von Funktionen in C++ ist dagegen sehr aufwendig und komplex.
